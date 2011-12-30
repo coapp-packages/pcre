@@ -1,0 +1,34 @@
+#product-info {
+	product-name: "pcre";
+	version: "8.21";
+	original-source-location: "ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.21.tar.bz2";
+	original-source-website: "http://www.pcre.org/";
+	license: "Modified BSD License";
+	packager: "Vincent Povirk <madewokherd@gmail.com>";
+}
+
+vc10 {
+	compiler: vc10;
+
+	// uses:exe@"..\cmake";
+
+	targets: {
+		"vc10\pcrecppd.dll",
+		"vc10\pcrecppd.lib",
+		"vc10\pcred.dll",
+		"vc10\pcred.lib",
+		"vc10\pcregrep.exe",
+		"vc10\pcreposixd.dll",
+		"vc10\pcreposixd.lib"
+	};
+
+	build-command: @"
+		set PATH=%PATH%;%CD%\..\cmake\exe\bin
+		mkdir vc10
+		cd vc10
+		cmake .. ""-GNMake Makefiles"" -DBUILD_SHARED_LIBS=ON
+		nmake
+	";
+
+	clean-command: "rmdir /Q /S vc10 2>NUL";
+}
