@@ -1,0 +1,142 @@
+@import "version.inc";
+@import "compat.inc";
+@import "outercurve.inc";
+
+#define { 
+    flavor: "${comp??vc10}"; 
+    arch : "${plat??x86}";
+}
+
+package {
+    name: "pcre[${flavor}]";
+    version: "${package-version}";
+    arch : "${arch}";
+    
+    display-name: "PCRE";
+    location: "http://coapp.org/repository/${OutputFilename}";
+
+    feed: "http://coapp.org/repository/packages.atom.xml";
+    publisher: "CoApp Project";
+}
+
+files[exes] {
+    root: @"..\output\${flavor}\${arch}";
+    
+    include: {
+        "pcregrep.exe",
+    };
+    
+    trim-path: all;
+};
+
+
+files[dlls] {
+    root: @"..\output\${flavor}\${arch}";
+  
+    include: {
+        "pcre.dll",
+        "pcrecpp.dll",
+        "pcreposix.dll",
+    };
+    
+    trim-path: all;
+};
+
+files[pdbs] {
+    root: @"..\output\${flavor}\${arch}";
+  
+    include: {
+        "pcre.pdb",
+        "pcrecpp.pdb",
+        "pcreposix.pdb",
+    };
+    
+    trim-path: all;
+};
+
+files[files-to-sign] {
+    include: { 
+        exes,
+        dlls
+    };    
+}
+
+metadata {
+    summary: "PCRE";
+    description:  @"Perl Compatable Regular Expressions"; 
+
+    icon: @"pcre.png";
+    
+    author-version : "8.21";
+    bug-tracker: "https://github.com/coapp-packages/pcre5/issues";
+    stability : "0";
+    licenses : {
+        PCRE
+    };
+}
+
+application {
+    include : {
+        exes,
+    };
+}
+
+requires {
+    package: "zlib[${flavor}]-1.2.5-${Package.Architecture}-${Package.PublicKeyToken}";
+    package: "libbz2[${flavor}]-1.0.6-${Package.Architecture}-${Package.PublicKeyToken}";
+}
+
+manifest[things-that-need-them] {
+    // all of our EXEs need to get the manifest entries for the assemblies we're creating in this package
+    
+    assembly : {
+        "pcre[${flavor}]",
+        "zlib[${flavor}]",
+        "libbz2[${flavor}]",
+    };
+    
+    include : { 
+        exes
+    };
+}
+
+manifest[things-that-need-them2] {
+    // all of our EXEs need to get the manifest entries for the assemblies we're creating in this package
+    
+    assembly : {
+        "zlib[${flavor}]",
+        "libbz2[${flavor}]",
+    };
+    
+    include : { 
+        dlls
+    };
+}
+
+assembly[pcre[${flavor}]] {
+    include : {
+        dlls,
+        pdbs,
+    };
+}
+
+package-composition {
+    symlinks : { 
+        exes => @"${bin}\${each.Name}" = @"${packagedir}\${each.Name}";
+    };
+}
+
+signing {
+    attributes : {
+        company="Outercurve Foundation",
+        description="pcre",
+        product-name="pcre",
+        product-version="${package-version}",
+        file-version="${package-version}",
+    };
+    
+    replace-signature: true; 
+    include: { 
+        files-to-sign
+    };    
+}

@@ -1,3 +1,10 @@
+/* target information */
+@import "version.inc";
+
+#define {
+    NewVersion : "${package-version++}";
+}
+
 #product-info {
 	product-name: "pcre";
 	version: "8.21";
@@ -7,28 +14,149 @@
 	packager: "Vincent Povirk <madewokherd@gmail.com>";
 }
 
-vc10 {
-	compiler: vc10;
+package {
+    
+    set: {
+        COMP="${COMP??vc10}",
+        PLAT="${PLAT??x86, x64}",
+    };
+    uses: {
+        update-version,
+        sign,
+    };
+    targets: { 
+        (COMP,PLAT) => @"copkg\pcre-dev[${0}]-${NewVersion}-${1}.msi",
+    };
+    
+    build-command : @"
+        for /F ""tokens=1 delim=, "" %%J in (${COMP}) do (
+            for /F ""tokens=1 delim=, "" %%K in (${PLAT}) do (
+                ptk pack-prep --COMP=%%J --PLAT=%%K
+            )
+        )
+        cd COPKG
+        autopackage pcre-dev-common.autopkg || goto failed
+        for %%A in (${COMP}) do (
+            for %%B in (${PLAT}) do (
+                autopackage --COMP=%%A --PLAT=%%B pcre.autopkg pcre-dev.autopkg || goto failed
+            )
+        )
+    ";
 
-	// uses:exe@"..\cmake";
+	clean-command: @"del COPKG\*.msi COPKG\*.wixpdb";
+	
+};
+
+pack-prep {
+    set: {
+        COMP="${COMP??vc10}",
+        PLAT="${PLAT??x86}",
+    };
+    build-command: @"
+        mkdir includes
+        copy -y pcrecpp.h includes\
+        copy -y pcreposix.h includes\
+        copy -y pcre_scanner.h includes\
+        copy -y ucp.h includes\
+        copy -y output\${COMP}\${PLAT}\pcre.h includes\
+        copy -y output\${COMP}\${PLAT}\pcre_stringpiece.h includes\
+        copy -y output\${COMP}\${PLAT}\pcredpparg.h includes\
+    ";
+}
+
+update-version {
+    build-command : @"
+        REM auto-increment version.inc file...
+        if ""${noversion}"" == ""true"" goto :endver
+        pushd COPKG
+        setlocal EnableDelayedExpansion
+        set VERSTRING=#define { package-version: ${NewVersion}; }
+        echo !VERSTRING! > version.inc
+        popd
+        :endver
+    ";
+}
+
+test{
+    set: {
+        COMP="${COMP??vc10}";
+        PLAT="${PLAT??x86, x64}";
+    };
+    uses: release;
+    build-command: @"
+        for %%A in (${COMP}) do (
+            for %%B in (${PLAT}) do (
+                pushd output\%%A\%%B
+                pcrecpp_unittest.exe || goto failed
+                pcre_scanner_unittest.exe || goto failed
+                pcre_stringpiece_unittest.exe || goto failed
+                echo;-q>>tmp.txt
+                echo;-q -s>>tmp.txt
+                for %%t in (1 2 7 11) do (
+                    echo Running Test #%%t...
+                    for /F ""delims=,"" %%o in (tmp.txt) do (
+                        if ""%%t"" equ ""7"" (
+                            pcretest.exe %%o -dfa ..\..\..\testdata\testinput%%t testtry && (FC ..\..\..\testdata\testoutput%%t testtry >nul && (if ""%%o"" equ ""-q -s"" ( echo;  OK with study ) else ( echo;  OK )) || ( echo Failed:  not expected output & goto failed )) || ( echo Failed:  error running 'pcretest.exe' & goto failed )
+                        ) else (
+                            pcretest.exe %%o ..\..\..\testdata\testinput%%t testtry && (FC ..\..\..\testdata\testoutput%%t testtry >nul && (if ""%%o"" equ ""-q -s"" ( echo;  OK with study ) else ( echo;  OK )) || ( echo Failed:  not expected output & goto failed )) || ( echo Failed:  error running 'pcretest.exe' & goto failed )
+                        )
+                    )
+                )
+                del tmp.txt
+                popd
+            )
+        )
+    ";
+}
+
+release {
+    set: {
+        BuildCfg="Release";
+        COMP="${COMP??vc10}";
+        PLAT="${PLAT??x86, x64}";
+    };
+    
+    build-command: @"
+        if ""${BUILT}"" equ ""true"" goto endrel
+        for %%A in (${COMP}) do (
+            for %%B in (${PLAT}) do (
+                ptk --nologo base --COMP=%%A --PLAT=%%B || goto failed
+            )
+        )
+        :endrel
+    ";
+	clean-command: "rmdir /Q /S output 2>NUL";
+};
+
+base {
+    set: {
+        COMP="${COMP??vc10}";
+        PLAT="${PLAT??x86}";
+    };
+	compiler: "${COMP}";
+    platform: "${PLAT}";
+
+    requires: "cmake-2.8-1e373a58e25250cb";
 
 	targets: {
-		"vc10\pcrecppd.dll",
-		"vc10\pcrecppd.lib",
-		"vc10\pcred.dll",
-		"vc10\pcred.lib",
-		"vc10\pcregrep.exe",
-		"vc10\pcreposixd.dll",
-		"vc10\pcreposixd.lib"
+		"output\${COMP}\${PLAT}\pcrecpp.dll",
+		"output\${COMP}\${PLAT}\pcrecpp.lib",
+		"output\${COMP}\${PLAT}\pcre.dll",
+		"output\${COMP}\${PLAT}\pcre.lib",
+		"output\${COMP}\${PLAT}\pcregrep.exe",
+		"output\${COMP}\${PLAT}\pcreposix.dll",
+		"output\${COMP}\${PLAT}\pcreposix.lib"
 	};
 
 	build-command: @"
-		set PATH=%PATH%;%CD%\..\cmake\exe\bin
-		mkdir vc10
-		cd vc10
-		cmake .. ""-GNMake Makefiles"" -DBUILD_SHARED_LIBS=ON
+		mkdir output\${COMP}\${PLAT}
+		pushd output\${COMP}\${PLAT}
+		echo cmake ..\..\.. -G ""NMake Makefiles"" -DBUILD_SHARED_LIBS=ON -DBZIP2_INCLUDE_DIR=""%ProgramData%\include\libbz2"" -DBZIP2_LIBRARIES=""%ProgramData%\lib\${PLAT}\libbz2.lib"" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_FLAGS=""/DWIN32 /D_WINDOWS /W3 /Zm1000 /EHsc /GR /DISOLATION_AWARE_ENABLED"" -DCMAKE_C_FLAGS=""/DWIN32 /D_WINDOWS /W3 /Zm1000 /DISOLATION_AWARE_ENABLED"" -DPCRE_LINK_SIZE=4 -DZLIB_INCLUDE_DIR=""%ProgramData%\include\zlib"" -DZLIB_LIBRARY=""%ProgramData%\lib\${PLAT}\zlib1.lib"" -DCMAKE_SKIP_RPATH=YES -DPCRE_SUPPORT_JIT=YES -DPCRE_SUPPORT_UNICODE_PROPERTIES=YES -DPCRE_SUPPORT_UTF8=YES
+        cmake ..\..\.. -G ""NMake Makefiles"" -DBUILD_SHARED_LIBS=ON -DBZIP2_INCLUDE_DIR=""%ProgramData%\include\libbz2"" -DBZIP2_LIBRARIES=""%ProgramData%\lib\${PLAT}\libbz2.lib"" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_FLAGS=""/DWIN32 /D_WINDOWS /W3 /Zm1000 /EHsc /GR /DISOLATION_AWARE_ENABLED"" -DCMAKE_C_FLAGS=""/DWIN32 /D_WINDOWS /W3 /Zm1000 /DISOLATION_AWARE_ENABLED"" -DPCRE_LINK_SIZE=4 -DZLIB_INCLUDE_DIR=""%ProgramData%\include\zlib"" -DZLIB_LIBRARY=""%ProgramData%\lib\${PLAT}\zlib1.lib"" -DCMAKE_SKIP_RPATH=YES -DPCRE_SUPPORT_JIT=YES -DPCRE_SUPPORT_UNICODE_PROPERTIES=YES -DPCRE_SUPPORT_UTF8=YES
+        REM READLINE_INCLUDE_DIR=<path>  READLINE_LIBRARY=<path>
 		nmake
+        popd
 	";
 
-	clean-command: "rmdir /Q /S vc10 2>NUL";
+	clean-command: "rmdir /Q /S output\${COMP}\${PLAT} 2>NUL";
 }

@@ -1,0 +1,60 @@
+@import "version.inc" ;
+@import "compat.inc";
+@import "outercurve.inc" ;
+
+package {
+    name: "pcre-dev-common";
+    version: "${package-version}";
+    arch: any;
+    display-name: "PCRE Dev Library-common";
+}
+
+metadata {
+    summary: "The PCRE developer library (common)";
+    description: @"Perl Compatable Regular Expressions"; 
+        
+    icon: @"pcre.png";
+    
+    author-version : "8.21";
+    bug-tracker: "https://github.com/coapp-packages/pcre5/issues";
+    stability : "0";
+    licenses : {
+        PCRE
+    };
+}
+
+files[headers] {
+    root: @"..\include\";
+    include: {
+        "*.h"
+    };
+    
+    trim-path:all;
+    
+    // ensures that all the header files end up in a subfolder called 'include'
+    destination-path:"include";
+}
+
+files[docs] {
+    root: @"..\doc\";
+    include: {
+        "**"
+    };
+    
+    trim-path:minimal;
+    
+    // ensures that all the documentation files end up in a subfolder called 'docs'
+    destination-path:"docs";
+
+}
+
+// the 'name' of the developer library isn't terribly important...
+developer-library[pcre] {
+    headers: { 
+        headers
+    };
+
+	docs: {
+        docs
+    };
+}

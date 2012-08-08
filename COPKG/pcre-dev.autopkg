@@ -1,0 +1,53 @@
+@import "version.inc" ;
+@import "compat.inc";
+@import "outercurve.inc" ;
+
+#define { 
+    flavor: "${comp??vc10}"; 
+    arch : "${plat??x86}";
+}
+
+package {
+    name: "pcre-dev[${flavor}]";
+    version: "${package-version}";
+    arch : "${arch}";
+
+    display-name: "PCRE developer library";
+}
+
+metadata {
+    summary: "The PCRE developer library";
+    description: @"Perl Compatible Regular Expressions"; 
+
+    icon: @"pcre.png";
+    
+    author-version : "8.21";
+    bug-tracker: "https://github.com/coapp-packages/pcre5/issues";
+    stability : "0";
+    licenses : {
+        PCRE
+    };
+}
+
+files[libs] {
+    root: @"..\output\${flavor}\${arch}";
+    
+    include: {
+        "pcre.lib",
+        "pcrecpp.lib",
+        "pcreposix.lib",
+    };
+    
+    trim-path: all;
+};
+
+requires {
+    package: "pcre-dev-common-${package-version}-any-${Package.PublicKeyToken}";
+    package: "pcre[${flavor}]-${package-version}-${Package.Architecture}-${Package.PublicKeyToken}";
+}
+
+developer-library[pcre[${flavor}]] {
+    libraries : {
+        libs
+    };
+}
