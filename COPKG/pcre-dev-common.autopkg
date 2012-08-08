@@ -24,7 +24,7 @@ metadata {
 }
 
 files[headers] {
-    root: @"..\include\";
+    root: @"..\includes\";
     include: {
         "*.h"
     };
