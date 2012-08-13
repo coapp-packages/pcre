@@ -149,6 +149,9 @@ base {
 	};
 
 	build-command: @"
+        REM this makes it so that DLLs can have their own SxS Activation Context in an embedded resource.
+        echo %CL% | findstr ISOLATION_AWARE || set CL=%CL% /D ISOLATION_AWARE_ENABLED /U NOUSER 
+
 		mkdir output\${COMP}\${PLAT}
 		pushd output\${COMP}\${PLAT}
 		echo cmake ..\..\.. -G ""NMake Makefiles"" -DBUILD_SHARED_LIBS=ON -DBZIP2_INCLUDE_DIR=""%ProgramData%\include\libbz2"" -DBZIP2_LIBRARIES=""%ProgramData%\lib\${PLAT}\libbz2.lib"" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_FLAGS=""/DWIN32 /D_WINDOWS /W3 /Zm1000 /EHsc /GR /DISOLATION_AWARE_ENABLED"" -DCMAKE_C_FLAGS=""/DWIN32 /D_WINDOWS /W3 /Zm1000 /DISOLATION_AWARE_ENABLED"" -DPCRE_LINK_SIZE=4 -DZLIB_INCLUDE_DIR=""%ProgramData%\include\zlib"" -DZLIB_LIBRARY=""%ProgramData%\lib\${PLAT}\zlib1.lib"" -DCMAKE_SKIP_RPATH=YES -DPCRE_SUPPORT_JIT=YES -DPCRE_SUPPORT_UNICODE_PROPERTIES=YES -DPCRE_SUPPORT_UTF8=YES
