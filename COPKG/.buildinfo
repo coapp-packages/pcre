@@ -22,15 +22,15 @@ package {
     };
     uses: {
         update-version,
-        sign,
+        release,
     };
     targets: { 
         (COMP,PLAT) => @"copkg\pcre-dev[${0}]-${NewVersion}-${1}.msi",
     };
     
     build-command : @"
-        for /F ""tokens=1 delim=, "" %%J in (${COMP}) do (
-            for /F ""tokens=1 delim=, "" %%K in (${PLAT}) do (
+        for %%J in (${COMP}) do (
+            for %%K in (${PLAT}) do (
                 ptk pack-prep --COMP=%%J --PLAT=%%K
             )
         )
@@ -54,13 +54,13 @@ pack-prep {
     };
     build-command: @"
         mkdir includes
-        copy -y pcrecpp.h includes\
-        copy -y pcreposix.h includes\
-        copy -y pcre_scanner.h includes\
-        copy -y ucp.h includes\
-        copy -y output\${COMP}\${PLAT}\pcre.h includes\
-        copy -y output\${COMP}\${PLAT}\pcre_stringpiece.h includes\
-        copy -y output\${COMP}\${PLAT}\pcredpparg.h includes\
+        copy /y pcrecpp.h includes\
+        copy /y pcreposix.h includes\
+        copy /y pcre_scanner.h includes\
+        copy /y ucp.h includes\
+        copy /y output\${COMP}\${PLAT}\pcre.h includes\
+        copy /y output\${COMP}\${PLAT}\pcre_stringpiece.h includes\
+        copy /y output\${COMP}\${PLAT}\pcrecpparg.h includes\
     ";
 }
 
