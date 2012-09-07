@@ -90,19 +90,8 @@ test{
                 pcrecpp_unittest.exe || goto failed
                 pcre_scanner_unittest.exe || goto failed
                 pcre_stringpiece_unittest.exe || goto failed
-                echo;-q>>tmp.txt
-                echo;-q -s>>tmp.txt
-                for %%t in (1 2 7 11) do (
-                    echo Running Test #%%t...
-                    for /F ""delims=,"" %%o in (tmp.txt) do (
-                        if ""%%t"" equ ""7"" (
-                            pcretest.exe %%o -dfa ..\..\..\testdata\testinput%%t testtry && (FC ..\..\..\testdata\testoutput%%t testtry >nul && (if ""%%o"" equ ""-q -s"" ( echo;  OK with study ) else ( echo;  OK )) || ( echo Failed:  not expected output & goto failed )) || ( echo Failed:  error running 'pcretest.exe' & goto failed )
-                        ) else (
-                            pcretest.exe %%o ..\..\..\testdata\testinput%%t testtry && (FC ..\..\..\testdata\testoutput%%t testtry >nul && (if ""%%o"" equ ""-q -s"" ( echo;  OK with study ) else ( echo;  OK )) || ( echo Failed:  not expected output & goto failed )) || ( echo Failed:  error running 'pcretest.exe' & goto failed )
-                        )
-                    )
-                )
-                del tmp.txt
+				set srcdir=..\..\..
+				..\..\..\RunTest.bat || goto failed
                 popd
             )
         )
