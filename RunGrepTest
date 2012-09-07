@@ -9,9 +9,10 @@
 LC_ALL=C
 export LC_ALL
 
-# Remove any non-default colouring that the caller may have set.
+# Remove any non-default colouring and aliases that the caller may have set.
 
 unset PCREGREP_COLOUR PCREGREP_COLOR
+unset cp ls mv rm
 
 # Set the program to be tested, and valgrind settings when requested.
 
@@ -66,7 +67,7 @@ fi
 
 # Check for the availability of UTF-8 support
 
-./pcretest -C | ./pcregrep "No UTF-8 support" >/dev/null
+./pcretest -C utf >/dev/null
 utf8=$?
 
 echo "---------------------------- Test 1 ------------------------------" >testtry
@@ -406,6 +407,46 @@ echo "---------------------------- Test 83 -----------------------------" >>test
 (cd $srcdir; $valgrind $pcregrep --buffer-size=100 "^a" ./testdata/grepinput3) >>testtry 2>&1
 echo "RC=$?" >>testtry
 
+echo "---------------------------- Test 84 -----------------------------" >>testtry
+(cd $srcdir; $valgrind $pcregrep --file-list ./testdata/grepfilelist "fox|complete") >>testtry 2>&1
+echo "RC=$?" >>testtry
+
+echo "---------------------------- Test 85 -----------------------------" >>testtry
+(cd $srcdir; $valgrind $pcregrep --file-list=./testdata/grepfilelist "dolor" ./testdata/grepinput3) >>testtry 2>&1
+echo "RC=$?" >>testtry
+
+echo "---------------------------- Test 86 -----------------------------" >>testtry
+(cd $srcdir; $valgrind $pcregrep "dog" ./testdata/grepbinary) >>testtry 2>&1
+echo "RC=$?" >>testtry
+
+echo "---------------------------- Test 87 -----------------------------" >>testtry
+(cd $srcdir; $valgrind $pcregrep "cat" ./testdata/grepbinary) >>testtry 2>&1
+echo "RC=$?" >>testtry
+
+echo "---------------------------- Test 88 -----------------------------" >>testtry
+(cd $srcdir; $valgrind $pcregrep -v "cat" ./testdata/grepbinary) >>testtry 2>&1
+echo "RC=$?" >>testtry
+
+echo "---------------------------- Test 89 -----------------------------" >>testtry
+(cd $srcdir; $valgrind $pcregrep -I "dog" ./testdata/grepbinary) >>testtry 2>&1
+echo "RC=$?" >>testtry
+
+echo "---------------------------- Test 90 -----------------------------" >>testtry
+(cd $srcdir; $valgrind $pcregrep --binary-files=without-match "dog" ./testdata/grepbinary) >>testtry 2>&1
+echo "RC=$?" >>testtry
+
+echo "---------------------------- Test 91 -----------------------------" >>testtry
+(cd $srcdir; $valgrind $pcregrep -a "dog" ./testdata/grepbinary) >>testtry 2>&1
+echo "RC=$?" >>testtry
+
+echo "---------------------------- Test 92 -----------------------------" >>testtry
+(cd $srcdir; $valgrind $pcregrep --binary-files=text "dog" ./testdata/grepbinary) >>testtry 2>&1
+echo "RC=$?" >>testtry
+
+echo "---------------------------- Test 93 -----------------------------" >>testtry
+(cd $srcdir; $valgrind $pcregrep --text "dog" ./testdata/grepbinary) >>testtry 2>&1
+echo "RC=$?" >>testtry
+
 # Now compare the results.
 
 $cf $srcdir/testdata/grepoutput testtry
@@ -454,8 +495,7 @@ pattern=`printf 'def\rjkl'`
 $valgrind $pcregrep -n --newline=cr -F "$pattern" testNinput >>testtry
 
 printf "%c--------------------------- Test N4 ------------------------------\r\n" - >>testtry
-pattern=`printf 'xxx\r\njkl'`
-$valgrind $pcregrep -n --newline=crlf -F "$pattern" testNinput >>testtry
+$valgrind $pcregrep -n --newline=crlf -F -f $srcdir/testdata/greppatN4 testNinput >>testtry
 
 printf "%c--------------------------- Test N5 ------------------------------\r\n" - >>testtry
 $valgrind $pcregrep -n --newline=any "^(abc|def|ghi|jkl)" testNinput >>testtry

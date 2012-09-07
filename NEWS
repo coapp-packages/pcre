@@ -1,6 +1,55 @@
 News about PCRE releases
 ------------------------
 
+Release 8.31 06-July-2012
+-------------------------
+
+This is mainly a bug-fixing release, with a small number of developments:
+
+. The JIT compiler now supports partial matching and the (*MARK) and
+  (*COMMIT) verbs.
+
+. PCRE_INFO_MAXLOOKBEHIND can be used to find the longest lookbehing in a
+  pattern.
+
+. There should be a performance improvement when using the heap instead of the
+  stack for recursion.
+
+. pcregrep can now be linked with libedit as an alternative to libreadline.
+
+. pcregrep now has a --file-list option where the list of files to scan is
+  given as a file.
+
+. pcregrep now recognizes binary files and there are related options.
+
+. The Unicode tables have been updated to 6.1.0.
+
+As always, the full list of changes is in the ChangeLog file.
+
+
+Release 8.30 04-February-2012
+-----------------------------
+
+Release 8.30 introduces a major new feature: support for 16-bit character
+strings, compiled as a separate library. There are a few changes to the
+8-bit library, in addition to some bug fixes.
+
+. The pcre_info() function, which has been obsolete for over 10 years, has
+  been removed.
+
+. When a compiled pattern was saved to a file and later reloaded on a host
+  with different endianness, PCRE used automatically to swap the bytes in some
+  of the data fields. With the advent of the 16-bit library, where more of this
+  swapping is needed, it is no longer done automatically. Instead, the bad
+  endianness is detected and a specific error is given. The user can then call
+  a new function called pcre_pattern_to_host_byte_order() (or an equivalent
+  16-bit function) to do the swap.
+
+. In UTF-8 mode, the values 0xd800 to 0xdfff are not legal Unicode
+  code points and are now faulted. (They are the so-called "surrogates"
+  that are reserved for coding high values in UTF-16.)
+
+
 Release 8.21 12-Dec-2011
 ------------------------
 

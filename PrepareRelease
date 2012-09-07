@@ -58,7 +58,7 @@ pcretest commands.
 End
 
 echo "Making pcre.txt"
-for file in pcre pcrebuild pcrematching pcreapi pcrecallout pcrecompat \
+for file in pcre pcre16 pcrebuild pcrematching pcreapi pcrecallout pcrecompat \
             pcrepattern pcresyntax pcreunicode pcrejit pcrepartial \
             pcreprecompile pcreperform pcreposix pcrecpp pcresample \
             pcrelimits pcrestack ; do
@@ -159,7 +159,9 @@ if [ "$1" = "doc" ] ; then exit; fi
 # These files are detrailed; do not detrail the test data because there may be
 # significant trailing spaces. Do not detrail RunTest.bat, because it has CRLF
 # line endings and the detrail script removes all trailing white space. The
-# configure files are also omitted from the detrailing.
+# configure files are also omitted from the detrailing. We don't bother with
+# those pcre16_xx files that just define COMPILE_PCRE16 and then #include the
+# common file, because they aren't going to change.
 
 files="\
   Makefile.am \
@@ -171,6 +173,7 @@ files="\
   AUTHORS \
   NEWS \
   NON-UNIX-USE \
+  NON-AUTOTOOLS-BUILD \
   INSTALL \
   132html \
   CleanTxt \
@@ -181,10 +184,10 @@ files="\
   RunTest \
   pcre-config.in \
   libpcre.pc.in \
+  libpcre16.pc.in \
   libpcreposix.pc.in \
   libpcrecpp.pc.in \
   config.h.in \
-  pcre_printint.src \
   pcre_chartables.c.dist \
   pcredemo.c \
   pcregrep.c \
@@ -194,6 +197,7 @@ files="\
   pcreposix.h \
   pcre.h.in \
   pcre_internal.h
+  pcre_byte_order.c \
   pcre_compile.c \
   pcre_config.c \
   pcre_dfa_exec.c \
@@ -201,20 +205,23 @@ files="\
   pcre_fullinfo.c \
   pcre_get.c \
   pcre_globals.c \
-  pcre_info.c \
   pcre_jit_compile.c \
   pcre_jit_test.c \
   pcre_maketables.c \
   pcre_newline.c \
   pcre_ord2utf8.c \
+  pcre16_ord2utf16.c \
+  pcre_printint.c \
   pcre_refcount.c \
+  pcre_string_utils.c \
   pcre_study.c \
   pcre_tables.c \
-  pcre_try_flipped.c \
   pcre_ucp_searchfuncs.c \
   pcre_valid_utf8.c \
   pcre_version.c \
   pcre_xclass.c \
+  pcre16_utf16_utils.c \
+  pcre16_valid_utf16.c \
   pcre_scanner.cc \
   pcre_scanner.h \
   pcre_scanner_unittest.cc \

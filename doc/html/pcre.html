@@ -28,10 +28,29 @@ support for one or two .NET and Oniguruma syntax items, and there is an option
 for requesting some minor changes that give better JavaScript compatibility.
 </P>
 <P>
+Starting with release 8.30, it is possible to compile two separate PCRE
+libraries: the original, which supports 8-bit character strings (including
+UTF-8 strings), and a second library that supports 16-bit character strings
+(including UTF-16 strings). The build process allows either one or both to be
+built. The majority of the work to make this possible was done by Zoltan
+Herczeg.
+</P>
+<P>
+The two libraries contain identical sets of functions, except that the names in
+the 16-bit library start with <b>pcre16_</b> instead of <b>pcre_</b>. To avoid
+over-complication and reduce the documentation maintenance load, most of the
+documentation describes the 8-bit library, with the differences for the 16-bit
+library described separately in the
+<a href="pcre16.html"><b>pcre16</b></a>
+page. References to functions or structures of the form <i>pcre[16]_xxx</i>
+should be read as meaning "<i>pcre_xxx</i> when using the 8-bit library and
+<i>pcre16_xxx</i> when using the 16-bit library".
+</P>
+<P>
 The current implementation of PCRE corresponds approximately with Perl 5.12,
-including support for UTF-8 encoded strings and Unicode general category
-properties. However, UTF-8 and Unicode support has to be explicitly enabled; it
-is not the default. The Unicode tables correspond to Unicode release 6.0.0.
+including support for UTF-8/16 encoded strings and Unicode general category
+properties. However, UTF-8/16 and Unicode support has to be explicitly enabled;
+it is not the default. The Unicode tables correspond to Unicode release 6.0.0.
 </P>
 <P>
 In addition to the Perl-compatible matching function, PCRE contains an
@@ -44,8 +63,8 @@ page.
 <P>
 PCRE is written in C and released as a C library. A number of people have
 written wrappers and interfaces of various kinds. In particular, Google Inc.
-have provided a comprehensive C++ wrapper. This is now included as part of the
-PCRE distribution. The
+have provided a comprehensive C++ wrapper for the 8-bit library. This is now
+included as part of the PCRE distribution. The
 <a href="pcrecpp.html"><b>pcrecpp</b></a>
 page has details of this interface. Other people's contributions can be found
 in the <i>Contrib</i> directory at the primary FTP site, which is:
@@ -73,13 +92,13 @@ found in the <b>README</b> and <b>NON-UNIX-USE</b> files in the source
 distribution.
 </P>
 <P>
-The library contains a number of undocumented internal functions and data
+The libraries contains a number of undocumented internal functions and data
 tables that are used by more than one of the exported external functions, but
 which are not intended for use by external callers. Their names all begin with
-"_pcre_", which hopefully will not provoke any name clashes. In some
-environments, it is possible to control which external symbols are exported
-when a shared library is built, and in these cases the undocumented symbols are
-not exported.
+"_pcre_" or "_pcre16_", which hopefully will not provoke any name clashes. In
+some environments, it is possible to control which external symbols are
+exported when a shared library is built, and in these cases the undocumented
+symbols are not exported.
 </P>
 <br><a name="SEC2" href="#TOC1">USER DOCUMENTATION</a><br>
 <P>
@@ -90,30 +109,31 @@ all the sections, except the <b>pcredemo</b> section, are concatenated, for ease
 of searching. The sections are as follows:
 <pre>
   pcre              this document
+  pcre16            details of the 16-bit library
   pcre-config       show PCRE installation configuration information
   pcreapi           details of PCRE's native C API
   pcrebuild         options for building PCRE
   pcrecallout       details of the callout feature
   pcrecompat        discussion of Perl compatibility
-  pcrecpp           details of the C++ wrapper
+  pcrecpp           details of the C++ wrapper for the 8-bit library
   pcredemo          a demonstration C program that uses PCRE
-  pcregrep          description of the <b>pcregrep</b> command
+  pcregrep          description of the <b>pcregrep</b> command (8-bit only)
   pcrejit           discussion of the just-in-time optimization support
   pcrelimits        details of size and other limits
   pcrematching      discussion of the two matching algorithms
   pcrepartial       details of the partial matching facility
   pcrepattern       syntax and semantics of supported regular expressions
   pcreperform       discussion of performance issues
-  pcreposix         the POSIX-compatible C API
+  pcreposix         the POSIX-compatible C API for the 8-bit library
   pcreprecompile    details of saving and re-using precompiled patterns
   pcresample        discussion of the pcredemo program
   pcrestack         discussion of stack usage
   pcresyntax        quick syntax reference
   pcretest          description of the <b>pcretest</b> testing command
-  pcreunicode       discussion of Unicode and UTF-8 support
+  pcreunicode       discussion of Unicode and UTF-8/16 support
 </pre>
 In addition, in the "man" and HTML formats, there is a short page for each
-C library function, listing its arguments and results.
+8-bit C library function, listing its arguments and results.
 </P>
 <br><a name="SEC3" href="#TOC1">AUTHOR</a><br>
 <P>
@@ -131,9 +151,9 @@ two digits 10, at the domain cam.ac.uk.
 </P>
 <br><a name="SEC4" href="#TOC1">REVISION</a><br>
 <P>
-Last updated: 24 August 2011
+Last updated: 10 January 2012
 <br>
-Copyright &copy; 1997-2011 University of Cambridge.
+Copyright &copy; 1997-2012 University of Cambridge.
 <br>
 <p>
 Return to the <a href="index.html">PCRE index page</a>.

@@ -22,6 +22,10 @@ SYNOPSIS
 <b>pcre_extra *pcre_study(const pcre *<i>code</i>, int <i>options</i>,</b>
 <b>const char **<i>errptr</i>);</b>
 </P>
+<P>
+<b>pcre16_extra *pcre16_study(const pcre16 *<i>code</i>, int <i>options</i>,</b>
+<b>const char **<i>errptr</i>);</b>
+</P>
 <br><b>
 DESCRIPTION
 </b><br>
@@ -30,11 +34,12 @@ This function studies a compiled pattern, to see if additional information can
 be extracted that might speed up matching. Its arguments are:
 <pre>
   <i>code</i>       A compiled regular expression
-  <i>options</i>    Options for <b>pcre_study()</b>
+  <i>options</i>    Options for <b>pcre[16]_study()</b>
   <i>errptr</i>     Where to put an error message
 </pre>
 If the function succeeds, it returns a value that can be passed to
-<b>pcre_exec()</b> or <b>pcre_dfa_exec()</b> via their <i>extra</i> arguments.
+<b>pcre[16]_exec()</b> or <b>pcre[16]_dfa_exec()</b> via their <i>extra</i>
+arguments.
 </P>
 <P>
 If the function returns NULL, either it could not find any additional

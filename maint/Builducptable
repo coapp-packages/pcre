@@ -1,0 +1,215 @@
+############################################################
+############################################################
+## As of PCRE 8.0 this file is OBSOLETE. A different way  ##
+## of handling Unicode property data is now used. See the ##
+## maint/README document.                                 ##
+## PH 02 July 2008                                        ##
+############################################################
+############################################################
+
+#! /usr/bin/perl -w
+
+# This is a Perl script to create the table of character properties. For
+# information on the format, see ucpinternal.h. The Unicode files are expected
+# to be in Unicode.tables/{Scripts,UnicodeData}.txt. The ../ucp.h file is also
+# required. The table is written to the standard output.
+
+# The script is rather slow because it just searches linearly through the
+# Scripts data in order to find the script for each character or character
+# range. It could be made faster by sorting that data, or something, but hey,
+# it is only ever run once in a blue moon. (It's even slower after I mended the
+# "forgot to check for script number before amalgamation" bug, but even so,
+# the effort of improving it isn't worth it.)
+
+# Subroutine: Given a character number, return the script number. The 
+# Scripts.txt file has been read into an array, keeping just the codepoints
+# and the script name. The lines are in one of two formats:
+#
+# xxxx name
+# xxxx..yyyy name
+#
+# where xxxx and yyyy are code points.
+
+sub script{
+my($n) = $_[0];
+foreach $line (@scriptlist)
+  {
+  my($a,$z,$s);
+    
+  if ($line =~ /\.\./)
+    {
+    ($a,$z,$s) = $line =~ /^([^\.]+)\.\.(\S+)\s+(.*)/;
+    }
+  else
+    {
+    ($a,$s) = $line =~ /^(\S+)\s+(.*)/;
+    $z = $a; 
+    }       
+  
+  die "Problem on this scripts data line:\n$line"
+    if (!defined $a || !defined $z);
+
+  if ($n >= hex($a) && $n <= hex($z))
+    {
+    my($x) = $scriptnum{$s};
+    return $x if defined $x; 
+    die "Can't find script number for $s\n"; 
+    }  
+  } 
+  
+# All code points not explicitly listed are "Common" 
+
+return $scriptnum{"Common"};
+}
+
+
+# Subroutine: given a category name, return its number
+
+sub category {
+my($x) = $gencat{$_[0]};
+return $x if defined $x;
+die "Can't find number for general category $_[0]\n";
+}
+
+
+# Subroutine: output an entry for a range, unless it isn't really a range,
+# in which case just output a single entry.
+
+sub outrange{
+my($cp,$ncp,$gc) = @_;
+my($flag) = ($cp != $ncp)? 0x00800000 : 0;
+printf "  { 0x%08x, 0x%08x },\n",
+ $cp | $flag | (script($cp) << 24), 
+  (category($gc) << 26) | $ncp - $cp;
+}
+
+
+# Entry point: An argument giving the Unicode version is required.
+
+die "Require a single argument, the Unicode version"
+  if ($#ARGV != 0);
+$Uversion = shift @ARGV; 
+
+
+# Read in the Scripts.txt file, retaining only the code points
+# and script names.
+
+open(IN, "Unicode.tables/Scripts.txt") ||
+  die "Can't open Unicode.tables/Scripts.txt: $!\n";
+  
+while (<IN>)
+  {
+  next if !/^[0-9A-Z]/;
+  my($range,$name) = $_ =~ /^(\S+)\s*;\s*(\S+)/;
+  push @scriptlist, "$range $name";
+  }  
+close(IN);
+
+
+# Now read the ucp.h file to get the values for the general categories
+# and for the scripts.
+
+open(IN, "../ucp.h") || die "Can't open ../ucp.h: $!\n";
+
+while (<IN>) { last if /^enum/; }
+while (<IN>) { last if /^enum/; }
+
+
+# The second enum are the general categories.
+
+$count = 0;
+while (<IN>)
+  {
+  last if $_ !~ /^\s+ucp_(..)/;
+  $gencat{$1} = $count++; 
+  } 
+
+while (<IN>) { last if /^enum/; }
+
+# The third enum are script names.
+
+$count = 0;
+while (<IN>)
+  {
+  last if $_ !~ /^\s+ucp_(\w+)/; 
+  $scriptnum{$1} = $count++;
+  }  
+
+close(IN);
+
+# Write out the initial boilerplace.
+
+print "/* This source module is automatically generated from the Unicode\n" .
+  "property table. See ucpinternal.h for a description of the layout.\n" .
+  "This version was made from the Unicode $Uversion tables. */\n\n" .
+  "static const cnode ucp_table[] = {\n";
+
+# Now read the input file and generate the output.
+
+open(IN, "Unicode.tables/UnicodeData.txt") || 
+  die "Can't open Unicode.tables/UnicodeData.txt: $!\n";
+
+while (<IN>)
+  {
+  @fields = split /;/;
+  
+  $cp = hex($fields[0]);
+  $gc = $fields[2];
+  $uc = $fields[12]; 
+  $lc = $fields[13];
+  
+  # If this line has no "other case" data, it might be the start or end of
+  # a range, either one that is explicit in the data, or one that we can
+  # create by scanning forwards.  
+  
+  if ($uc eq "" && $lc eq "")
+    {
+    if ($fields[1] =~ /First>$/)
+      {
+      $_ = <IN>;
+      @fields = split /;/;
+      die "First not followed by Last\n", if $fields[1] !~ /Last>$/;
+      die "First and last have different categories\n", 
+        if $gc ne $fields[2];
+      outrange($cp, hex($fields[0]), $gc);
+      }  
+ 
+    else
+      {
+      my($startscript) = script($cp);  
+      my($ncp) = $cp + 1;
+      while (<IN>)
+        {
+        @fields = split /;/;
+        last if (hex($fields[0]) != $ncp ||
+                 $fields[2]  ne $gc  ||
+                 $fields[12] ne ""  ||
+                 $fields[13] ne ""  ||
+                 script($ncp) != $startscript);
+                
+        $ncp++;
+        }  
+      
+      $ncp--;
+      outrange($cp, $ncp, $gc);
+      redo if defined $_;             # Reprocess terminating line
+      } 
+    }
+    
+  # If there is an "other case" character, we output a single-char line
+
+  else
+    {
+    my($co) = (hex(($uc eq "")? $lc : $uc) - $cp) & 0xffff;
+    printf "  { 0x%08x, 0x%08x },\n",
+     $cp | (script($cp) << 24), (category($gc) << 26) | $co;
+    }   
+  }
+  
+close(IN);
+
+# Final boilerplate
+
+print "};\n"; 
+  
+# End  

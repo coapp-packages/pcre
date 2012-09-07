@@ -384,7 +384,6 @@ int RE::GlobalReplace(const StringPiece& rewrite,
   int vec[kVecSize];
   string out;
   int start = 0;
-  int lastend = -1;
   bool last_match_was_empty_string = false;
 
   while (start <= static_cast<int>(str->length())) {
@@ -440,7 +439,6 @@ int RE::GlobalReplace(const StringPiece& rewrite,
     out.append(*str, start, matchstart - start);
     Rewrite(&out, rewrite, *str, vec, matches);
     start = matchend;
-    lastend = matchend;
     count++;
     last_match_was_empty_string = (matchstart == matchend);
   }

@@ -20,13 +20,14 @@ There are some size limitations in PCRE but it is hoped that they will never in
 practice be relevant.
 </P>
 <P>
-The maximum length of a compiled pattern is 65539 (sic) bytes if PCRE is
-compiled with the default internal linkage size of 2. If you want to process
+The maximum length of a compiled pattern is approximately 64K data units (bytes
+for the 8-bit library, 16-bit units for the 16-bit library) if PCRE is compiled
+with the default internal linkage size of 2 bytes. If you want to process
 regular expressions that are truly enormous, you can compile PCRE with an
-internal linkage size of 3 or 4 (see the <b>README</b> file in the source
-distribution and the
+internal linkage size of 3 or 4 (when building the 16-bit library, 3 is rounded
+up to 4). See the <b>README</b> file in the source distribution and the
 <a href="pcrebuild.html"><b>pcrebuild</b></a>
-documentation for details). In these cases the limit is substantially larger.
+documentation for details. In these cases the limit is substantially larger.
 However, the speed of execution is slower.
 </P>
 <P>
@@ -45,6 +46,10 @@ the count. There is no limit to the number of backward references.
 <P>
 The maximum length of name for a named subpattern is 32 characters, and the
 maximum number of named subpatterns is 10000.
+</P>
+<P>
+The maximum length of a name in a (*MARK), (*PRUNE), (*SKIP), or (*THEN) verb
+is 255 for the 8-bit library and 65535 for the 16-bit library.
 </P>
 <P>
 The maximum length of a subject string is the largest positive number that an
@@ -71,9 +76,9 @@ Cambridge CB2 3QH, England.
 REVISION
 </b><br>
 <P>
-Last updated: 30 November 2011
+Last updated: 04 May 2012
 <br>
-Copyright &copy; 1997-2011 University of Cambridge.
+Copyright &copy; 1997-2012 University of Cambridge.
 <br>
 <p>
 Return to the <a href="index.html">PCRE index page</a>.

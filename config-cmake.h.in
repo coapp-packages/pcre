@@ -18,9 +18,11 @@
 
 #cmakedefine PCRE_STATIC 1
 
+#cmakedefine SUPPORT_PCRE8 1
+#cmakedefine SUPPORT_PCRE16 1
 #cmakedefine SUPPORT_JIT 1
 #cmakedefine SUPPORT_PCREGREP_JIT 1
-#cmakedefine SUPPORT_UTF8 1
+#cmakedefine SUPPORT_UTF 1
 #cmakedefine SUPPORT_UCP 1
 #cmakedefine EBCDIC 1
 #cmakedefine BSR_ANYCRLF 1
@@ -31,6 +33,7 @@
 
 #cmakedefine SUPPORT_LIBBZ2 1
 #cmakedefine SUPPORT_LIBZ 1
+#cmakedefine SUPPORT_LIBEDIT 1
 #cmakedefine SUPPORT_LIBREADLINE 1
 
 #define NEWLINE			@NEWLINE@

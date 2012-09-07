@@ -21,6 +21,9 @@ SYNOPSIS
 <P>
 <b>int pcre_config(int <i>what</i>, void *<i>where</i>);</b>
 </P>
+<P>
+<b>int pcre16_config(int <i>what</i>, void *<i>where</i>);</b>
+</P>
 <br><b>
 DESCRIPTION
 </b><br>
@@ -38,6 +41,9 @@ point to an unsigned long integer. The available codes are:
 <pre>
   PCRE_CONFIG_JIT           Availability of just-in-time compiler
                               support (1=yes 0=no)
+  PCRE_CONFIG_JITTARGET     String containing information about the
+                              target architecture for the JIT compiler,
+                              or NULL if there is no JIT support
   PCRE_CONFIG_LINK_SIZE     Internal link size: 2, 3, or 4
   PCRE_CONFIG_MATCH_LIMIT   Internal resource limit
   PCRE_CONFIG_MATCH_LIMIT_RECURSION
@@ -55,12 +61,17 @@ point to an unsigned long integer. The available codes are:
                             Threshold of return slots, above which
                               <b>malloc()</b> is used by the POSIX API
   PCRE_CONFIG_STACKRECURSE  Recursion implementation (1=stack 0=heap)
-  PCRE_CONFIG_UTF8          Availability of UTF-8 support (1=yes 0=no)
+  PCRE_CONFIG_UTF16         Availability of UTF-16 support (1=yes
+                               0=no); option for <b>pcre16_config()</b>
+  PCRE_CONFIG_UTF8          Availability of UTF-8 support (1=yes 0=no);
+                              option for <b>pcre_config()</b>
   PCRE_CONFIG_UNICODE_PROPERTIES
                             Availability of Unicode property support
                               (1=yes 0=no)
 </pre>
-The function yields 0 on success or PCRE_ERROR_BADOPTION otherwise.
+The function yields 0 on success or PCRE_ERROR_BADOPTION otherwise. That error
+is also given if PCRE_CONFIG_UTF16 is passed to <b>pcre_config()</b> or if
+PCRE_CONFIG_UTF8 is passed to <b>pcre16_config()</b>.
 </P>
 <P>
 There is a complete description of the PCRE native API in the
