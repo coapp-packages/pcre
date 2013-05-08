@@ -9,4 +9,8 @@ right away. The others require the linke size to be 2. */
 
 <!testsaved16BE-1
 
+<!testsaved32LE-1
+
+<!testsaved32BE-1
+
 /-- End of testinput21 --/

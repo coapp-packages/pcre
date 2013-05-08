@@ -21,6 +21,9 @@ The HTML documentation for PCRE comprises the following pages:
 <tr><td><a href="pcre16.html">pcre16</a></td>
     <td>&nbsp;&nbsp;Discussion of the 16-bit PCRE library</td></tr>
 
+<tr><td><a href="pcre32.html">pcre32</a></td>
+    <td>&nbsp;&nbsp;Discussion of the 32-bit PCRE library</td></tr>
+
 <tr><td><a href="pcre-config.html">pcre-config</a></td>
     <td>&nbsp;&nbsp;Information about the installation configuration</td></tr>
 
@@ -82,12 +85,13 @@ The HTML documentation for PCRE comprises the following pages:
     <td>&nbsp;&nbsp;The <b>pcretest</b> command for testing PCRE</td></tr>
 
 <tr><td><a href="pcreunicode.html">pcreunicode</a></td>
-    <td>&nbsp;&nbsp;Discussion of Unicode and UTF-8/UTF-16 support</td></tr>
+    <td>&nbsp;&nbsp;Discussion of Unicode and UTF-8/UTF-16/UTF-32 support</td></tr>
 </table>
 
 <p>
-There are also individual pages that summarize the interface for each function 
-in the library. There is a single page for each pair of 8-bit/16-bit functions.
+There are also individual pages that summarize the interface for each function
+in the library. There is a single page for each triple of 8-bit/16-bit/32-bit
+functions.
 </p>
 
 <table>    
@@ -165,6 +169,9 @@ in the library. There is a single page for each pair of 8-bit/16-bit functions.
 
 <tr><td><a href="pcre_utf16_to_host_byte_order.html">pcre_utf16_to_host_byte_order</a></td>
     <td>&nbsp;&nbsp;Convert UTF-16 string to host byte order if necessary</td></tr>
+
+<tr><td><a href="pcre_utf32_to_host_byte_order.html">pcre_utf32_to_host_byte_order</a></td>
+    <td>&nbsp;&nbsp;Convert UTF-32 string to host byte order if necessary</td></tr>
 
 <tr><td><a href="pcre_version.html">pcre_version</a></td>
     <td>&nbsp;&nbsp;Return PCRE version and release date</td></tr>

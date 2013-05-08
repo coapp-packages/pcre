@@ -1,4 +1,4 @@
-.TH PCREPARTIAL 3 "24 February 2012" "PCRE 8.31"
+.TH PCREPARTIAL 3 "24 June 2012" "PCRE 8.31"
 .SH NAME
 PCRE - Perl-compatible regular expressions
 .SH "PARTIAL MATCHING IN PCRE"
@@ -33,8 +33,8 @@ the details differ between the two types of matching function. If both options
 are set, PCRE_PARTIAL_HARD takes precedence.
 .P
 If you want to use partial matching with just-in-time optimized code, you must
-call \fBpcre_study()\fP or \fBpcre16_study()\fP with one or both of these
-options:
+call \fBpcre_study()\fP, \fBpcre16_study()\fP or  \fBpcre32_study()\fP with one
+or both of these options:
 .sp
   PCRE_STUDY_JIT_PARTIAL_SOFT_COMPILE
   PCRE_STUDY_JIT_PARTIAL_HARD_COMPILE
@@ -52,11 +52,11 @@ matching string, and does not bother to run the matching function on shorter
 strings. This optimization is also disabled for partial matching.
 .
 .
-.SH "PARTIAL MATCHING USING pcre_exec() OR pcre16_exec()"
+.SH "PARTIAL MATCHING USING pcre_exec() OR pcre[16|32]_exec()"
 .rs
 .sp
 A partial match occurs during a call to \fBpcre_exec()\fP or
-\fBpcre16_exec()\fP when the end of the subject string is reached successfully,
+\fBpcre[16|32]_exec()\fP when the end of the subject string is reached successfully,
 but matching cannot continue because more characters are needed. However, at
 least one character in the subject must have been inspected. This character
 need not form part of the final matched string; lookbehind assertions and the
@@ -86,10 +86,10 @@ What happens when a partial match is identified depends on which of the two
 partial matching options are set.
 .
 .
-.SS "PCRE_PARTIAL_SOFT WITH pcre_exec() OR pcre16_exec()"
+.SS "PCRE_PARTIAL_SOFT WITH pcre_exec() OR pcre[16|32]_exec()"
 .rs
 .sp
-If PCRE_PARTIAL_SOFT is set when \fBpcre_exec()\fP or \fBpcre16_exec()\fP
+If PCRE_PARTIAL_SOFT is set when \fBpcre_exec()\fP or \fBpcre[16|32]_exec()\fP
 identifies a partial match, the partial match is remembered, but matching
 continues as normal, and other alternatives in the pattern are tried. If no
 complete match can be found, PCRE_ERROR_PARTIAL is returned instead of
@@ -114,10 +114,10 @@ example, there are two partial matches, because "dog" on its own partially
 matches the second alternative.)
 .
 .
-.SS "PCRE_PARTIAL_HARD WITH pcre_exec() OR pcre16_exec()"
+.SS "PCRE_PARTIAL_HARD WITH pcre_exec() OR pcre[16|32]_exec()"
 .rs
 .sp
-If PCRE_PARTIAL_HARD is set for \fBpcre_exec()\fP or \fBpcre16_exec()\fP,
+If PCRE_PARTIAL_HARD is set for \fBpcre_exec()\fP or \fBpcre[16|32]_exec()\fP,
 PCRE_ERROR_PARTIAL is returned as soon as a partial match is found, without
 continuing to search for possible complete matches. This option is "hard"
 because it prefers an earlier partial match over a later complete match. For
@@ -162,7 +162,7 @@ The second pattern will never match "dogsbody", because it will always find the
 shorter match first.
 .
 .
-.SH "PARTIAL MATCHING USING pcre_dfa_exec() OR pcre16_dfa_exec()"
+.SH "PARTIAL MATCHING USING pcre_dfa_exec() OR pcre[16|32]_dfa_exec()"
 .rs
 .sp
 The DFA functions move along the subject string character by character, without
@@ -254,7 +254,7 @@ If the escape sequence \eP is present more than once in a \fBpcretest\fP data
 line, the PCRE_PARTIAL_HARD option is set for the match.
 .
 .
-.SH "MULTI-SEGMENT MATCHING WITH pcre_dfa_exec() OR pcre16_dfa_exec()"
+.SH "MULTI-SEGMENT MATCHING WITH pcre_dfa_exec() OR pcre[16|32]_dfa_exec()"
 .rs
 .sp
 When a partial match has been found using a DFA matching function, it is
@@ -283,7 +283,7 @@ facility can be used to pass very long subject strings to the DFA matching
 functions.
 .
 .
-.SH "MULTI-SEGMENT MATCHING WITH pcre_exec() OR pcre16_exec()"
+.SH "MULTI-SEGMENT MATCHING WITH pcre_exec() OR pcre[16|32]_exec()"
 .rs
 .sp
 From release 8.00, the standard matching functions can also be used to do
@@ -330,7 +330,7 @@ includes the effect of PCRE_NOTEOL.
 offsets that are returned for a partial match. However a lookbehind assertion
 later in the pattern could require even earlier characters to be inspected. You
 can handle this case by using the PCRE_INFO_MAXLOOKBEHIND option of the
-\fBpcre_fullinfo()\fP or \fBpcre16_fullinfo()\fP functions to obtain the length
+\fBpcre_fullinfo()\fP or \fBpcre[16|32]_fullinfo()\fP functions to obtain the length
 of the largest lookbehind in the pattern. This length is given in characters,
 not bytes. If you always retain at least that many characters before the
 partially matched string, all should be well. (Of course, near the start of the
@@ -440,6 +440,6 @@ Cambridge CB2 3QH, England.
 .rs
 .sp
 .nf
-Last updated: 24 February 2012
+Last updated: 24 June 2012
 Copyright (c) 1997-2012 University of Cambridge.
 .fi
