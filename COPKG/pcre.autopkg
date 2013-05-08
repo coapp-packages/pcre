@@ -1,142 +1,95 @@
-@import "version.inc";
-@import "compat.inc";
-@import "outercurve.inc";
+@import @"version.inc";
 
-#define { 
-    flavor: "${comp??vc10}"; 
-    arch : "${plat??x86}";
-}
+nuget {
+    nuspec {
+        id: pcre;
+        version : 8.32.0.0;
+        title: pcre;
+        authors: {pcre contributors, Benjamin Herila};
+        owners: {Benjamin Herila, CoApp Project};
+        licenseUrl: "http://www.pcre.org/licence.txt";
+        projectUrl: "http://www.pcre.org";
+        iconUrl: "https://download-codeplex.sec.s-msft.com/Download?ProjectName=casablanca&DownloadId=630102&Build=20425";
+        requireLicenseAcceptance:false;
+        summary:"The PCRE library is a set of functions that implement regular expression pattern matching using the same syntax and semantics as Perl 5. PCRE has its own native API, as well as a set of wrapper functions that correspond to the POSIX regular expression API. The PCRE library is free, even for building proprietary software.";
 
-package {
-    name: "pcre[${flavor}]";
-    version: "${package-version}";
-    arch : "${arch}";
-    
-    display-name: "PCRE";
-    location: "http://coapp.org/repository/${OutputFilename}";
-
-    feed: "http://coapp.org/repository/packages.atom.xml";
-    publisher: "CoApp Project";
-}
-
-files[exes] {
-    root: @"..\output\${flavor}\${arch}";
-    
-    include: {
-        "pcregrep.exe",
+        description: @"The PCRE library is a set of functions that implement regular expression pattern matching using the same syntax and semantics as Perl 5. PCRE has its own native API, as well as a set of wrapper functions that correspond to the POSIX regular expression API. The PCRE library is free, even for building proprietary software.
+		
+		PCRE was originally written for the Exim MTA, but is now used by many high-profile open source projects, including Apache, PHP, KDE, Postfix, Analog, and Nmap. PCRE has also found its way into some well known commercial products, like Apple Safari. Some other interesting projects using PCRE include Chicken, Ferite, Onyx, Hypermail, Leafnode, Askemos, and Wenlin.
+        ";
+        releaseNotes: "";
+        copyright: Copyright 2013;
+        tags: { pcre, regex, native, CoApp };
     };
-    
-    trim-path: all;
-};
+	
+	files { 
+		include: {
+			..\ucp.h,
+			..\pcrecpp.h,
+			..\pcreposix.h,
+			..\pcre_scanner.h
+		};
+		
+		source: {
+			..\*.h,
+			..\*.c
+		};
+		
+		[Win32,v110,static,release] {
+			lib:     { ..\~vc11.x86\release\*.lib };
+			bin:     { ..\~vc11.x86\release\*.dll };
+			symbols: { ..\~vc11.x86\release\*.pdb };
+			include: {
+				..\~vc11.x86\pcre_stringpiece.h,
+				..\~vc11.x86\pcrecpparg.h,
+				..\~vc11.x86\pcre.h,
+			};
+		};
+		
+		[x64,v110,static,debug] {
+			lib:     { ..\~vc11.x64\debug\*.lib };
+			bin:     { ..\~vc11.x64\debug\*.dll };
+			symbols: { ..\~vc11.x64\debug\*.pdb };
+			include: {
+				..\~vc11.x64\pcre_stringpiece.h,
+				..\~vc11.x64\pcrecpparg.h,
+				..\~vc11.x64\pcre.h,
+			};
+		};
+		
+		[x64,v100,static,release] {
+			lib:     { ..\~vc10.x64\release\*.lib };
+			bin:     { ..\~vc10.x64\release\*.dll };
+			symbols: { ..\~vc10.x64\release\*.pdb };
+			include: {
+				..\~vc10.x6\pcre_stringpiece.h,
+				..\~vc10.x6\pcrecpparg.h,
+				..\~vc10.x6\pcre.h,
+			};
+		};
+		
+		[Win32,v100,static,debug] {
+			lib:     { ..\~vc10.x86\debug\*.lib };
+			bin:     { ..\~vc10.x86\debug\*.dll };
+			symbols: { ..\~vc10.x86\debug\*.pdb };
+			include: {
+				..\~vc10.x86\pcre_stringpiece.h,
+				..\~vc10.x86\pcrecpparg.h,
+				..\~vc10.x86\pcre.h,
+			};
+		};
+	};
+	
+/*	
+	dependencies {
+		packages : {
+			zlib/1.2.7.32
+		};
+	};
+*/
 
-
-files[dlls] {
-    root: @"..\output\${flavor}\${arch}";
-  
-    include: {
-        "pcre.dll",
-        "pcrecpp.dll",
-        "pcreposix.dll",
-    };
-    
-    trim-path: all;
-};
-
-files[pdbs] {
-    root: @"..\output\${flavor}\${arch}";
-  
-    include: {
-        "pcre.pdb",
-        "pcrecpp.pdb",
-        "pcreposix.pdb",
-    };
-    
-    trim-path: all;
-};
-
-files[files-to-sign] {
-    include: { 
-        exes,
-        dlls
-    };    
-}
-
-metadata {
-    summary: "PCRE";
-    description:  @"Perl Compatable Regular Expressions"; 
-
-    icon: @"pcre.png";
-    
-    author-version : "8.21";
-    bug-tracker: "https://github.com/coapp-packages/pcre5/issues";
-    stability : "0";
-    licenses : {
-        PCRE
-    };
-}
-
-application {
-    include : {
-        exes,
-    };
-}
-
-requires {
-    package: "zlib[${flavor}]-1.2.5-${Package.Architecture}-${Package.PublicKeyToken}";
-    package: "libbz2[${flavor}]-1.0.6-${Package.Architecture}-${Package.PublicKeyToken}";
-}
-
-manifest[things-that-need-them] {
-    // all of our EXEs need to get the manifest entries for the assemblies we're creating in this package
-    
-    assembly : {
-        "pcre[${flavor}]",
-        "zlib[${flavor}]",
-        "libbz2[${flavor}]",
-    };
-    
-    include : { 
-        exes
-    };
-}
-
-manifest[things-that-need-them2] {
-    // all of our EXEs need to get the manifest entries for the assemblies we're creating in this package
-    
-    assembly : {
-        "zlib[${flavor}]",
-        "libbz2[${flavor}]",
-    };
-    
-    include : { 
-        dlls
-    };
-}
-
-assembly[pcre[${flavor}]] {
-    include : {
-        dlls,
-        pdbs,
-    };
-}
-
-package-composition {
-    symlinks : { 
-        exes => @"${bin}\${each.Name}" = @"${packagedir}\${each.Name}";
-    };
-}
-
-signing {
-    attributes : {
-        company="Outercurve Foundation",
-        description="pcre",
-        product-name="pcre",
-        product-version="${package-version}",
-        file-version="${package-version}",
-    };
-    
-    replace-signature: true; 
-    include: { 
-        files-to-sign
-    };    
+	targets {
+		Defines += HAS_PCRE;
+	};
+		
 }
