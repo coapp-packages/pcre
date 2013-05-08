@@ -3,7 +3,7 @@
 nuget {
     nuspec {
         id: pcre;
-        version : 8.32.0.0;
+        version : 8.32.0.1;
         title: pcre;
         authors: {pcre contributors, Benjamin Herila};
         owners: {Benjamin Herila, CoApp Project};
@@ -37,7 +37,7 @@ nuget {
 		
 		[Win32,v110,static,release] {
 			lib:     { ..\~vc11.x86\release\*.lib };
-			bin:     { ..\~vc11.x86\release\*.dll };
+			bin:     { ..\~vc11.x86\release\*.exe };
 			symbols: { ..\~vc11.x86\release\*.pdb };
 			include: {
 				..\~vc11.x86\pcre_stringpiece.h,
@@ -48,7 +48,7 @@ nuget {
 		
 		[x64,v110,static,debug] {
 			lib:     { ..\~vc11.x64\debug\*.lib };
-			bin:     { ..\~vc11.x64\debug\*.dll };
+			bin:     { ..\~vc11.x64\debug\*.exe };
 			symbols: { ..\~vc11.x64\debug\*.pdb };
 			include: {
 				..\~vc11.x64\pcre_stringpiece.h,
@@ -59,18 +59,18 @@ nuget {
 		
 		[x64,v100,static,release] {
 			lib:     { ..\~vc10.x64\release\*.lib };
-			bin:     { ..\~vc10.x64\release\*.dll };
+			bin:     { ..\~vc10.x64\release\*.exe };
 			symbols: { ..\~vc10.x64\release\*.pdb };
 			include: {
-				..\~vc10.x6\pcre_stringpiece.h,
-				..\~vc10.x6\pcrecpparg.h,
-				..\~vc10.x6\pcre.h,
+				..\~vc10.x64\pcre_stringpiece.h,
+				..\~vc10.x64\pcrecpparg.h,
+				..\~vc10.x64\pcre.h,
 			};
 		};
 		
 		[Win32,v100,static,debug] {
 			lib:     { ..\~vc10.x86\debug\*.lib };
-			bin:     { ..\~vc10.x86\debug\*.dll };
+			bin:     { ..\~vc10.x86\debug\*.exe };
 			symbols: { ..\~vc10.x86\debug\*.pdb };
 			include: {
 				..\~vc10.x86\pcre_stringpiece.h,
