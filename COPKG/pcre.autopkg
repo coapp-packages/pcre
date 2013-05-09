@@ -3,7 +3,7 @@
 nuget {
     nuspec {
         id: pcre;
-        version : 8.32.0.1;
+        version: 8.32.0.7;
         title: pcre;
         authors: {pcre contributors, Benjamin Herila};
         owners: {Benjamin Herila, CoApp Project};
@@ -35,7 +35,9 @@ nuget {
 			..\*.c
 		};
 		
-		[Win32,v110,static,release] {
+		/* VS2012 ***************************************************************/
+		
+		[x86,v110,static,release] {
 			lib:     { ..\~vc11.x86\release\*.lib };
 			bin:     { ..\~vc11.x86\release\*.exe };
 			symbols: { ..\~vc11.x86\release\*.pdb };
@@ -45,7 +47,28 @@ nuget {
 				..\~vc11.x86\pcre.h,
 			};
 		};
+		[x86,v110,static,debug] {
+			lib:     { ..\~vc11.x86\debug\*.lib };
+			bin:     { ..\~vc11.x86\debug\*.exe };
+			symbols: { ..\~vc11.x86\debug\*.pdb };
+			include: {
+				..\~vc11.x86\pcre_stringpiece.h,
+				..\~vc11.x86\pcrecpparg.h,
+				..\~vc11.x86\pcre.h,
+			};
+		};
 		
+		[x64,v110,static,release] {
+			lib:     { ..\~vc11.x64\release\*.lib };
+			bin:     { ..\~vc11.x64\release\*.exe };
+			symbols: { ..\~vc11.x64\release\*.pdb };
+			include: {
+				..\~vc11.x64\pcre_stringpiece.h,
+				..\~vc11.x64\pcrecpparg.h,
+				..\~vc11.x64\pcre.h,
+			};
+		};
+
 		[x64,v110,static,debug] {
 			lib:     { ..\~vc11.x64\debug\*.lib };
 			bin:     { ..\~vc11.x64\debug\*.exe };
@@ -57,6 +80,8 @@ nuget {
 			};
 		};
 		
+		/* VS2010 ***************************************************************/
+		
 		[x64,v100,static,release] {
 			lib:     { ..\~vc10.x64\release\*.lib };
 			bin:     { ..\~vc10.x64\release\*.exe };
@@ -67,8 +92,28 @@ nuget {
 				..\~vc10.x64\pcre.h,
 			};
 		};
+		[x64,v100,static,debug] {
+			lib:     { ..\~vc10.x64\debug\*.lib };
+			bin:     { ..\~vc10.x64\debug\*.exe };
+			symbols: { ..\~vc10.x64\debug\*.pdb };
+			include: {
+				..\~vc10.x64\pcre_stringpiece.h,
+				..\~vc10.x64\pcrecpparg.h,
+				..\~vc10.x64\pcre.h,
+			};
+		};
 		
-		[Win32,v100,static,debug] {
+		[x86,v100,static,release] {
+			lib:     { ..\~vc10.x86\release\*.lib };
+			bin:     { ..\~vc10.x86\release\*.exe };
+			symbols: { ..\~vc10.x86\release\*.pdb };
+			include: {
+				..\~vc10.x86\pcre_stringpiece.h,
+				..\~vc10.x86\pcrecpparg.h,
+				..\~vc10.x86\pcre.h,
+			};
+		};
+		[x86,v100,static,debug] {
 			lib:     { ..\~vc10.x86\debug\*.lib };
 			bin:     { ..\~vc10.x86\debug\*.exe };
 			symbols: { ..\~vc10.x86\debug\*.pdb };
@@ -78,18 +123,31 @@ nuget {
 				..\~vc10.x86\pcre.h,
 			};
 		};
+		
+		/************************************************************************/
+		
 	};
 	
-/*	
 	dependencies {
 		packages : {
-			zlib/1.2.7.32
+			bzip2/1.0.6.7
 		};
 	};
-*/
+
+	docs: { ..\doc\**\* };
 
 	targets {
 		Defines += HAS_PCRE;
+		
+		[x86,v110,static,release] { Defines += PCRE_STATIC; Includes += ${pkg_root}${d_include}\Win32\v110\static\release; }
+		[x64,v110,static,release] { Defines += PCRE_STATIC; Includes +=   ${pkg_root}${d_include}\x64\v110\static\release; }
+		[x86,v110,static,debug]   { Defines += PCRE_STATIC; Includes += ${pkg_root}${d_include}\Win32\v110\static\debug  ; }
+		[x64,v110,static,debug]   { Defines += PCRE_STATIC; Includes +=   ${pkg_root}${d_include}\x64\v110\static\debug  ; }
+		[x86,v100,static,release] { Defines += PCRE_STATIC; Includes += ${pkg_root}${d_include}\Win32\v100\static\release; }
+		[x64,v100,static,release] { Defines += PCRE_STATIC; Includes +=   ${pkg_root}${d_include}\x64\v100\static\release; }
+		[x86,v100,static,debug]   { Defines += PCRE_STATIC; Includes += ${pkg_root}${d_include}\Win32\v100\static\debug  ; }
+		[x64,v100,static,debug]   { Defines += PCRE_STATIC; Includes +=   ${pkg_root}${d_include}\x64\v100\static\debug  ; }
+		
 	};
 		
 }
