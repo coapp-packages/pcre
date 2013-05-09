@@ -1,3 +1,10 @@
 ~vc11.x64/
 ~vc11.x86/
 build/
+COPKG/pcre_pkgtest/Debug/
+COPKG/pcre_pkgtest/Release/
+*.sdf
+*.opensdf
+*.user
+COPKG/pcre_pkgtest/pcre_pkgtest/Debug/
+COPKG/pcre_pkgtest/pcre_pkgtest/Release/
