@@ -3,7 +3,7 @@
 nuget {
     nuspec {
         id: pcre;
-        version: 8.32.0.7;
+        version: 8.32.0.8;
         title: pcre;
         authors: {pcre contributors, Benjamin Herila};
         owners: {Benjamin Herila, CoApp Project};
@@ -18,7 +18,7 @@ nuget {
 		PCRE was originally written for the Exim MTA, but is now used by many high-profile open source projects, including Apache, PHP, KDE, Postfix, Analog, and Nmap. PCRE has also found its way into some well known commercial products, like Apple Safari. Some other interesting projects using PCRE include Chicken, Ferite, Onyx, Hypermail, Leafnode, Askemos, and Wenlin.
         ";
         releaseNotes: "";
-        copyright: Copyright 2013;
+        copyright: Copyright 2013; 
         tags: { pcre, regex, native, CoApp };
     };
 	
@@ -35,92 +35,146 @@ nuget {
 			..\*.c
 		};
 		
+		("x86,x64", "release,debug", "v100,v110", "dynamic,static") => {
+		[${0},${1},${2},${3}] {
+			lib:     { ..\~${0}.${3}.{2}\release\*.lib };
+			bin:     { ..\~${0}.${3}.{2}\release\*.exe };
+			symbols: { ..\~${0}.${3}.{2}\release\*.pdb };
+			include: { ..\~${0}.${3}.{2}\pcre_stringpiece.h,
+			           ..\~${0}.${3}.{2}\pcrecpparg.h,
+			           ..\~${0}.${3}.{2}\pcre.h
+			};
+		}
+		}
+		
 		/* VS2012 ***************************************************************/
 		
-		[x86,v110,static,release] {
-			lib:     { ..\~vc11.x86\release\*.lib };
-			bin:     { ..\~vc11.x86\release\*.exe };
-			symbols: { ..\~vc11.x86\release\*.pdb };
-			include: {
-				..\~vc11.x86\pcre_stringpiece.h,
-				..\~vc11.x86\pcrecpparg.h,
-				..\~vc11.x86\pcre.h,
+		[x86,v110,static,cdecl,release] {
+			lib:     { ..\~vc11.static.x86\release\*.lib };
+			bin:     { ..\~vc11.static.x86\release\*.exe };
+			symbols: { ..\~vc11.static.x86\release\*.pdb };
+			include: { ..\~vc11.static.x86\pcre_stringpiece.h,
+			           ..\~vc11.static.x86\pcrecpparg.h,
+			           ..\~vc11.static.x86\pcre.h
 			};
 		};
-		[x86,v110,static,debug] {
-			lib:     { ..\~vc11.x86\debug\*.lib };
-			bin:     { ..\~vc11.x86\debug\*.exe };
-			symbols: { ..\~vc11.x86\debug\*.pdb };
-			include: {
-				..\~vc11.x86\pcre_stringpiece.h,
-				..\~vc11.x86\pcrecpparg.h,
-				..\~vc11.x86\pcre.h,
+		[x86,v110,static,cdecl,debug] {
+			lib:     { ..\~vc11.static.x86\debug\*.lib };
+			bin:     { ..\~vc11.static.x86\debug\*.exe };
+			symbols: { ..\~vc11.static.x86\debug\*.pdb };
+			include: { ..\~vc11.static.x86\pcre_stringpiece.h,
+			           ..\~vc11.static.x86\pcrecpparg.h,
+			           ..\~vc11.static.x86\pcre.h
 			};
 		};
 		
-		[x64,v110,static,release] {
-			lib:     { ..\~vc11.x64\release\*.lib };
-			bin:     { ..\~vc11.x64\release\*.exe };
-			symbols: { ..\~vc11.x64\release\*.pdb };
-			include: {
-				..\~vc11.x64\pcre_stringpiece.h,
-				..\~vc11.x64\pcrecpparg.h,
-				..\~vc11.x64\pcre.h,
+		[x64,v110,static,cdecl,release] {
+			lib:     { ..\~vc11.static.x64\release\*.lib };
+			bin:     { ..\~vc11.static.x64\release\*.exe };
+			symbols: { ..\~vc11.static.x64\release\*.pdb };
+			include: { ..\~vc11.static.x64\pcre_stringpiece.h,
+			           ..\~vc11.static.x64\pcrecpparg.h,
+			           ..\~vc11.static.x64\pcre.h,
 			};
 		};
 
-		[x64,v110,static,debug] {
-			lib:     { ..\~vc11.x64\debug\*.lib };
-			bin:     { ..\~vc11.x64\debug\*.exe };
-			symbols: { ..\~vc11.x64\debug\*.pdb };
-			include: {
-				..\~vc11.x64\pcre_stringpiece.h,
-				..\~vc11.x64\pcrecpparg.h,
-				..\~vc11.x64\pcre.h,
+		[x64,v110,static,cdecl,debug] {
+			lib:     { ..\~vc11.static.x64\debug\*.lib };
+			bin:     { ..\~vc11.static.x64\debug\*.exe };
+			symbols: { ..\~vc11.static.x64\debug\*.pdb };
+			include: { ..\~vc11.static.x64\pcre_stringpiece.h,
+			           ..\~vc11.static.x64\pcrecpparg.h,
+			           ..\~vc11.static.x64\pcre.h
 			};
 		};
+		
+		[x86,v110,dynamic,cdecl,release] {
+			lib:     { ..\~vc11.dynamic.x86\release\*.lib };
+			bin:     { ..\~vc11.dynamic.x86\release\*.exe };
+			symbols: { ..\~vc11.dynamic.x86\release\*.pdb };
+			include: { ..\~vc11.dynamic.x86\pcre_stringpiece.h,
+			           ..\~vc11.dynamic.x86\pcrecpparg.h,
+			           ..\~vc11.dynamic.x86\pcre.h
+			};
+		};
+		
+		[x86,v110,dynamic,cdecl,release] {
+			lib:     { ..\~vc11.dynamic.x86\release\*.lib };
+			bin:     { ..\~vc11.dynamic.x86\release\*.exe };
+			symbols: { ..\~vc11.dynamic.x86\release\*.pdb };
+			include: { ..\~vc11.dynamic.x86\pcre_stringpiece.h,
+			           ..\~vc11.dynamic.x86\pcrecpparg.h,
+			           ..\~vc11.dynamic.x86\pcre.h
+			};
+		};
+		[x86,v110,dynamic,cdecl,debug] {
+			lib:     { ..\~vc11.dynamic.x86\debug\*.lib };
+			bin:     { ..\~vc11.dynamic.x86\debug\*.exe };
+			symbols: { ..\~vc11.dynamic.x86\debug\*.pdb };
+			include: { ..\~vc11.dynamic.x86\pcre_stringpiece.h,
+			           ..\~vc11.dynamic.x86\pcrecpparg.h,
+			           ..\~vc11.dynamic.x86\pcre.h
+			};
+		};
+		
+		[x64,v110,dynamic,cdecl,release] {
+			lib:     { ..\~vc11.dynamic.x64\release\*.lib };
+			bin:     { ..\~vc11.dynamic.x64\release\*.exe };
+			symbols: { ..\~vc11.dynamic.x64\release\*.pdb };
+			include: { ..\~vc11.dynamic.x64\pcre_stringpiece.h,
+			           ..\~vc11.dynamic.x64\pcrecpparg.h,
+			           ..\~vc11.dynamic.x64\pcre.h,
+			};
+		};
+
+		[x64,v110,dynamic,cdecl,debug] {
+			lib:     { ..\~vc11.dynamic.x64\debug\*.lib };
+			bin:     { ..\~vc11.dynamic.x64\debug\*.exe };
+			symbols: { ..\~vc11.dynamic.x64\debug\*.pdb };
+			include: { ..\~vc11.dynamic.x64\pcre_stringpiece.h,
+			           ..\~vc11.dynamic.x64\pcrecpparg.h,
+			           ..\~vc11.dynamic.x64\pcre.h
+			};
+		};
+		
 		
 		/* VS2010 ***************************************************************/
 		
-		[x64,v100,static,release] {
+		[x64,v100,static,cdecl,release] {
 			lib:     { ..\~vc10.x64\release\*.lib };
 			bin:     { ..\~vc10.x64\release\*.exe };
 			symbols: { ..\~vc10.x64\release\*.pdb };
-			include: {
-				..\~vc10.x64\pcre_stringpiece.h,
-				..\~vc10.x64\pcrecpparg.h,
-				..\~vc10.x64\pcre.h,
+			include: { ..\~vc10.x64\pcre_stringpiece.h,
+			           ..\~vc10.x64\pcrecpparg.h,
+			           ..\~vc10.x64\pcre.h,
 			};
 		};
-		[x64,v100,static,debug] {
+		[x64,v100,static,cdecl,debug] {
 			lib:     { ..\~vc10.x64\debug\*.lib };
 			bin:     { ..\~vc10.x64\debug\*.exe };
 			symbols: { ..\~vc10.x64\debug\*.pdb };
-			include: {
-				..\~vc10.x64\pcre_stringpiece.h,
-				..\~vc10.x64\pcrecpparg.h,
-				..\~vc10.x64\pcre.h,
+			include: { ..\~vc10.x64\pcre_stringpiece.h,
+			           ..\~vc10.x64\pcrecpparg.h,
+			           ..\~vc10.x64\pcre.h,
 			};
 		};
 		
-		[x86,v100,static,release] {
+		[x86,v100,static,cdecl,release] {
 			lib:     { ..\~vc10.x86\release\*.lib };
 			bin:     { ..\~vc10.x86\release\*.exe };
 			symbols: { ..\~vc10.x86\release\*.pdb };
-			include: {
-				..\~vc10.x86\pcre_stringpiece.h,
-				..\~vc10.x86\pcrecpparg.h,
-				..\~vc10.x86\pcre.h,
+			include: { ..\~vc10.x86\pcre_stringpiece.h,
+			           ..\~vc10.x86\pcrecpparg.h,
+			           ..\~vc10.x86\pcre.h
 			};
 		};
-		[x86,v100,static,debug] {
+		[x86,v100,static,cdecl,debug] {
 			lib:     { ..\~vc10.x86\debug\*.lib };
 			bin:     { ..\~vc10.x86\debug\*.exe };
 			symbols: { ..\~vc10.x86\debug\*.pdb };
-			include: {
-				..\~vc10.x86\pcre_stringpiece.h,
-				..\~vc10.x86\pcrecpparg.h,
-				..\~vc10.x86\pcre.h,
+			include: { ..\~vc10.x86\pcre_stringpiece.h,
+			           ..\~vc10.x86\pcrecpparg.h,
+			           ..\~vc10.x86\pcre.h
 			};
 		};
 		
@@ -139,14 +193,14 @@ nuget {
 	targets {
 		Defines += HAS_PCRE;
 		
-		[x86,v110,static,release] { Defines += PCRE_STATIC; Includes += ${pkg_root}${d_include}\Win32\v110\static\release; }
-		[x64,v110,static,release] { Defines += PCRE_STATIC; Includes +=   ${pkg_root}${d_include}\x64\v110\static\release; }
-		[x86,v110,static,debug]   { Defines += PCRE_STATIC; Includes += ${pkg_root}${d_include}\Win32\v110\static\debug  ; }
-		[x64,v110,static,debug]   { Defines += PCRE_STATIC; Includes +=   ${pkg_root}${d_include}\x64\v110\static\debug  ; }
-		[x86,v100,static,release] { Defines += PCRE_STATIC; Includes += ${pkg_root}${d_include}\Win32\v100\static\release; }
-		[x64,v100,static,release] { Defines += PCRE_STATIC; Includes +=   ${pkg_root}${d_include}\x64\v100\static\release; }
-		[x86,v100,static,debug]   { Defines += PCRE_STATIC; Includes += ${pkg_root}${d_include}\Win32\v100\static\debug  ; }
-		[x64,v100,static,debug]   { Defines += PCRE_STATIC; Includes +=   ${pkg_root}${d_include}\x64\v100\static\debug  ; }
+		[x86,v110,static,cdecl,release] { Defines += PCRE_STATIC; Includes += ${pkg_root}${d_include}\Win32\v110\static\release; }
+		[x64,v110,static,cdecl,release] { Defines += PCRE_STATIC; Includes +=   ${pkg_root}${d_include}\x64\v110\static\release; }
+		[x86,v110,static,cdecl,debug]   { Defines += PCRE_STATIC; Includes += ${pkg_root}${d_include}\Win32\v110\static\debug  ; }
+		[x64,v110,static,cdecl,debug]   { Defines += PCRE_STATIC; Includes +=   ${pkg_root}${d_include}\x64\v110\static\debug  ; }
+		[x86,v100,static,cdecl,release] { Defines += PCRE_STATIC; Includes += ${pkg_root}${d_include}\Win32\v100\static\release; }
+		[x64,v100,static,cdecl,release] { Defines += PCRE_STATIC; Includes +=   ${pkg_root}${d_include}\x64\v100\static\release; }
+		[x86,v100,static,cdecl,debug]   { Defines += PCRE_STATIC; Includes += ${pkg_root}${d_include}\Win32\v100\static\debug  ; }
+		[x64,v100,static,cdecl,debug]   { Defines += PCRE_STATIC; Includes +=   ${pkg_root}${d_include}\x64\v100\static\debug  ; }
 		
 	};
 		
