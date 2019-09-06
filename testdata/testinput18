@@ -1,5 +1,5 @@
-/-- This set of tests is for UTF-16 support, and is relevant only to the 16-bit
-    library. --/
+/-- This set of tests is for UTF-16 and UTF-32 support, and is relevant only to the
+    16- and 32-bit library. --/
 
 /ÃÃÃxxx/8?DZSS
 
@@ -8,9 +8,11 @@
 
 /X(\C{3})/8
     X\x{11234}Y
+    X\x{11234}YZ
 
 /X(\C{4})/8
     X\x{11234}YZ
+    X\x{11234}YZW
 
 /X\C*/8
     XYZabcdce
@@ -40,6 +42,7 @@
 
 /a\C\Cb/8
     a\x{12257}b
+    a\x{12257}\x{11234}b
     ** Failers
     a\x{100}b
 
@@ -171,7 +174,15 @@ correctly, but that messes up comparisons). --/
 /(*UTF16)\x{11234}/
   abcd\x{11234}pqr
 
+/(*UTF)\x{11234}/I
+  abcd\x{11234}pqr
+
+/(*UTF-32)\x{11234}/
+  abcd\x{11234}pqr
+
 /(*CRLF)(*UTF16)(*BSR_UNICODE)a\Rb/I
+
+/(*CRLF)(*UTF32)(*BSR_UNICODE)a\Rb/I
 
 /\h/SI8
     ABC\x{09}
@@ -238,6 +249,7 @@ correctly, but that messes up comparisons). --/
 
 /a/8
     \x{10000}\>1
+    \x{10000}ab\>1
     \x{10000}ab\>2
     \x{10000}ab\>3
     \x{10000}ab\>4

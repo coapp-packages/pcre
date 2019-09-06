@@ -16,6 +16,7 @@ This document contains the following sections:
   Building under Windows with BCC5.5
   Building PCRE on OpenVMS
   Building PCRE on Stratus OpenVOS
+  Building PCRE on native z/OS and z/VM
 
 
 GENERAL
@@ -50,14 +51,20 @@ the .generic versions are not used.
 GENERIC INSTRUCTIONS FOR THE PCRE C LIBRARY
 
 The following are generic instructions for building the PCRE C library "by
-hand":
+hand". If you are going to use CMake, this section does not apply to you; you
+can skip ahead to the CMake section.
 
  (1) Copy or rename the file config.h.generic as config.h, and edit the macro
      settings that it contains to whatever is appropriate for your environment.
-     In particular, if you want to force a specific value for newline, you can
-     define the NEWLINE macro. When you compile any of the PCRE modules, you
-     must specify -DHAVE_CONFIG_H to your compiler so that config.h is included
-     in the sources.
+
+     In particular, you can alter the definition of the NEWLINE macro to
+     specify what character(s) you want to be interpreted as line terminators.
+     In an EBCDIC environment, you MUST change NEWLINE, because its default
+     value is 10, an ASCII LF. The usual EBCDIC newline character is 21 (0x15,
+     NL), though in some cases it may be 37 (0x25).
+
+     When you compile any of the PCRE modules, you must specify -DHAVE_CONFIG_H
+     to your compiler so that config.h is included in the sources.
 
      An alternative approach is not to edit config.h, but to use -D on the
      compiler command line to make any changes that you need to the
@@ -106,6 +113,7 @@ hand":
        pcre_fullinfo.c
        pcre_get.c
        pcre_globals.c
+       pcre_jit_compile.c
        pcre_maketables.c
        pcre_newline.c
        pcre_ord2utf8.c
@@ -123,20 +131,19 @@ hand":
      sought in the current directory. Otherwise you run the risk of picking up
      a previously-installed file from somewhere else.
 
- (6) If you have defined SUPPORT_JIT in config.h, you must also compile
+     Note that you must still compile pcre_jit_compile.c, even if you have not
+     defined SUPPORT_JIT in config.h, because when JIT support is not
+     configured, dummy functions are compiled. When JIT support IS configured,
+     pcre_jit_compile.c #includes sources from the sljit subdirectory, where
+     there should be 16 files, all of whose names begin with "sljit".
 
-       pcre_jit_compile.c
-
-     This file #includes sources from the sljit subdirectory, where there
-     should be 16 files, all of whose names begin with "sljit".
-
- (7) Now link all the compiled code into an object library in whichever form
+ (6) Now link all the compiled code into an object library in whichever form
      your system keeps such libraries. This is the basic PCRE C 8-bit library.
      If your system has static and shared libraries, you may have to do this
      once for each type.
 
- (8) If you want to build a 16-bit library (as well as, or instead of the 8-bit
-     library) repeat steps 5-7 with the following files:
+ (7) If you want to build a 16-bit library (as well as, or instead of the 8-bit
+     or 32-bit libraries) repeat steps 5-6 with the following files:
 
        pcre16_byte_order.c
        pcre16_chartables.c
@@ -147,7 +154,7 @@ hand":
        pcre16_fullinfo.c
        pcre16_get.c
        pcre16_globals.c
-       pcre16_jit_compile.c (if SUPPORT_JIT is defined)
+       pcre16_jit_compile.c
        pcre16_maketables.c
        pcre16_newline.c
        pcre16_ord2utf16.c
@@ -161,26 +168,53 @@ hand":
        pcre16_version.c
        pcre16_xclass.c
 
- (9) If you want to build the POSIX wrapper functions (which apply only to the
+ (7') If you want to build a 16-bit library (as well as, or instead of the 8-bit
+     or 32-bit libraries) repeat steps 5-6 with the following files:
+
+       pcre32_byte_order.c
+       pcre32_chartables.c
+       pcre32_compile.c
+       pcre32_config.c
+       pcre32_dfa_exec.c
+       pcre32_exec.c
+       pcre32_fullinfo.c
+       pcre32_get.c
+       pcre32_globals.c
+       pcre32_jit_compile.c
+       pcre32_maketables.c
+       pcre32_newline.c
+       pcre32_ord2utf32.c
+       pcre32_refcount.c
+       pcre32_string_utils.c
+       pcre32_study.c
+       pcre32_tables.c
+       pcre32_ucd.c
+       pcre32_utf32_utils.c
+       pcre32_valid_utf32.c
+       pcre32_version.c
+       pcre32_xclass.c
+
+ (8) If you want to build the POSIX wrapper functions (which apply only to the
      8-bit library), ensure that you have the pcreposix.h file and then compile
      pcreposix.c (remembering -DHAVE_CONFIG_H if necessary). Link the result
      (on its own) as the pcreposix library.
 
-(10) The pcretest program can be linked with either or both of the 8-bit and
-     16-bit libraries (depending on what you selected in config.h). Compile
+ (9) The pcretest program can be linked with any combination of the 8-bit, 16-bit
+     and 32-bit libraries (depending on what you selected in config.h). Compile
      pcretest.c and pcre_printint.c (again, don't forget -DHAVE_CONFIG_H) and
      link them together with the appropriate library/ies. If you compiled an
      8-bit library, pcretest also needs the pcreposix wrapper library unless
      you compiled it with -DNOPOSIX.
 
-(11) Run pcretest on the testinput files in the testdata directory, and check
+(10) Run pcretest on the testinput files in the testdata directory, and check
      that the output matches the corresponding testoutput files. There are
      comments about what each test does in the section entitled "Testing PCRE"
-     in the README file. If you compiled both an 8-bit and a 16-bit library,
-     you need to run pcretest with the -16 option to do 16-bit tests.
+     in the README file. If you compiled more than one of the 8-bit, 16-bit and
+     32-bit libraries, you need to run pcretest with the -16 option to do 16-bit
+     tests and with the -32 option to do 32-bit tests.
 
      Some tests are relevant only when certain build-time options are selected.
-     For example, test 4 is for UTF-8 or UTF-16 support, and will not run if
+     For example, test 4 is for UTF-8/UTF-16/UTF-32 support, and will not run if
      you have built PCRE without it. See the comments at the start of each
      testinput file. If you have a suitable Unix-like shell, the RunTest script
      will run the appropriate tests for you.
@@ -193,11 +227,11 @@ hand":
      locale to "french" rather than "fr_FR", and there some minor output
      differences.
 
-(12) If you have built PCRE with SUPPORT_JIT, the JIT features will be tested
+(11) If you have built PCRE with SUPPORT_JIT, the JIT features will be tested
      by the testdata files. However, you might also like to build and run
      the JIT test program, pcre_jit_test.c.
 
-(13) If you want to use the pcregrep command, compile and link pcregrep.c; it
+(12) If you want to use the pcregrep command, compile and link pcregrep.c; it
      uses only the basic 8-bit PCRE library (it does not need the pcreposix
      library).
 
@@ -336,11 +370,15 @@ BUILDING PCRE ON WINDOWS WITH CMAKE
 CMake is an alternative configuration facility that can be used instead of
 "configure". CMake creates project files (make files, solution files, etc.)
 tailored to numerous development environments, including Visual Studio,
-Borland, Msys, MinGW, NMake, and Unix.  If possible, use short paths with no
+Borland, Msys, MinGW, NMake, and Unix. If possible, use short paths with no
 spaces in the names for your CMake installation and your PCRE source and build
 directories.
 
-The following instructions were contributed by a PCRE user.
+The following instructions were contributed by a PCRE user. If they are not
+followed exactly, errors may occur. In the event that errors do occur, it is
+recommended that you delete the CMake cache before attempting to repeat the
+CMake build process. In the CMake GUI, the cache can be deleted by selecting
+"File > Delete Cache".
 
 1.  Install the latest CMake version available from http://www.cmake.org/, and
     ensure that cmake\bin is on your path.
@@ -354,7 +392,8 @@ The following instructions were contributed by a PCRE user.
     source dir. For example, C:\pcre\pcre-xx\build.
 
 4.  Run cmake-gui from the Shell envirornment of your build tool, for example,
-    Msys for Msys/MinGW or Visual Studio Command Prompt for VC/VC++.
+    Msys for Msys/MinGW or Visual Studio Command Prompt for VC/VC++. Do not try
+    to start Cmake from the Windows Start menu, as this can lead to errors.
 
 5.  Enter C:\pcre\pcre-xx and C:\pcre\pcre-xx\build for the source and build
     directories, respectively.
@@ -581,5 +620,20 @@ appear to be related to the port itself, please let me know. Please see the
 build.log file in the root of the package also.
 
 
+BUILDING PCRE ON NATIVE Z/OS AND Z/VM
+
+z/OS and z/VM are operating systems for mainframe computers, produced by IBM.
+The character code used is EBCDIC, not ASCII or Unicode. In z/OS, UNIX APIs and
+applications can be supported through UNIX System Services, and in such an
+environment PCRE can be built in the same way as in other systems. However, in
+native z/OS (without UNIX System Services) and in z/VM, special ports are
+required. For details, please see this web site:
+
+  http://www.zaconsultants.net
+
+There is also a mirror here:
+
+  http://www.vsoft-software.com/downloads.html
+
 ==========================
-Last Updated: 18 June 2012
+Last Updated: 21 November 2012
